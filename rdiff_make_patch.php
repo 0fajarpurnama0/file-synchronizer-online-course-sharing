@@ -1,5 +1,4 @@
 <?php
-exec('rm backup.mbz.sig; rm backup.mbz.delta');
 $uploaddir = realpath('./') . '/';
 $uploadfile = $uploaddir . basename($_FILES['file_contents']['name']);
 echo '<pre>';
@@ -13,8 +12,9 @@ echo '<pre>';
 	echo "\n<hr />\n";
 	print_r($_POST);
 print "</pr" . "e>\n";
+
 exec('rdiff delta backup.mbz.sig backup.mbz backup.mbz.delta');
-$url='local_apply_patch.php';
+$url='http://192.168.56.1/php-practice/sync/local_apply_patch.php';
 echo '<META HTTP-EQUIV=REFRESH CONTENT="1; '.$url.'">';
 /*
 $target_url = "http://localhost/php-practice/sync/rdiff_apply_patch.php";
