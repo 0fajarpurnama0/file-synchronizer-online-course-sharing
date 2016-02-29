@@ -13,5 +13,7 @@ curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 curl_exec($ch); 
 curl_close($ch);
 fclose($fp);
-exec("rdiff patch backup.mbz backup.mbz.delta backup1.mbz; mv backup1.mbz backup.mbz; rm backup1.mbz");
+exec("rdiff patch backup.mbz backup.mbz.delta backup1.mbz; mv backup.mbz backup.mbz.backup; mv backup1.mbz backup.mbz; rm backup1.mbz");
+echo "update complete";
 ?>
+<a href="http://localhost/php-practice/sync/demo/rdiff_update_console.php"> Return</a>
