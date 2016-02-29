@@ -1,0 +1,35 @@
+body{
+ height: 100%;
+ margin: 0;
+ text-align: justify;
+ width: 100%;
+}
+
+h1{
+ font-size: 32px;
+ font-family: Palatino, 'Palatino Linotype', serif;
+}
+
+h2{
+ font-size: 32px;
+}
+
+h3{
+ color: darkgreen;
+}
+
+.hero{
+ padding: 250px 0;
+ margin: 30px;
+ background-image: url("https://s3.amazonaws.com/codecademy-content/projects/make-a-website/lesson-2/bg.jpg");
+ background-size: cover;
+}
+
+p{
+}
+
+.hero a{
+ color: #00FFAA;
+ font-size: 24px;
+ text-decoration: none;
+} 

@@ -1,5 +1,5 @@
 <?php
-exec('rm backup.mbz.sig; rm backup.mbz.delta');
+exec('rm backup.sig; rm backup.delta; rm -r backup');
 $uploaddir = realpath('./') . '/';
 $uploadfile = $uploaddir . basename($_FILES['file_contents']['name']);
 echo '<pre>';
@@ -13,7 +13,7 @@ echo '<pre>';
 	echo "\n<hr />\n";
 	print_r($_POST);
 print "</pr" . "e>\n";
-exec('rdiff delta backup.mbz.sig backup.mbz backup.mbz.delta');
+exec('mkdir backup; tar xf backup.mbz -C backup; rdiffdir delta backup.sig backup backup.delta');
 $url='local_apply_patch.php';
 echo '<META HTTP-EQUIV=REFRESH CONTENT="1; '.$url.'">';
 /*
@@ -27,5 +27,5 @@ $ch = curl_init();
     curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
 	$result=curl_exec ($ch);
 	curl_close ($ch);
-/*
+*/
 ?>
