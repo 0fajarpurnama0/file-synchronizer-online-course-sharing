@@ -1,6 +1,6 @@
 <?php
 session_start();
-$option = $_POST['option'];
+$option = $_SESSION['option'];
 foreach (glob($option . '/backup*') as $filename) {
   if (file_exists($filename)) {
     unlink($filename);
