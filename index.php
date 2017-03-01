@@ -11,6 +11,7 @@
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
 <select name="option">
   <option value="moodle">moodle</option>
+  <option value="moodletest">moodletest</option>
   <option value="manual">manual</option>
 </select>
 <input type="submit" value="choose">
@@ -20,8 +21,10 @@
  if ($_SERVER['REQUEST_METHOD'] == 'POST'){
   if (strcmp($_POST['option'],'moodle')==0){
     header("Location: moodle/rdiff_update_console.php");
-  } else {
+  } elseif((strcmp($_POST['option'],'manual')==0)) {
     header("Location: manual/rdiff_update_console.php");
+  } else {
+    header("Location: moodletest/rdiff_update_console.php");
   }  
  }      
 ?>
