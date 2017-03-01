@@ -22,7 +22,7 @@ if (file_exists($directory.'/local/fajar-moodle-sync/course_list.php')){
 <h3>If course doesn't exist, create a blank course manually at your moodle site.</h3>
 
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
-<select name="option">
+<select name="option" onclick="this.form.submit()">
   <?php if(isset($_POST['option'])) { ?>
   <option value ="<?php echo $_POST['option']; ?>"><?php echo $_POST['option']; ?></option>
   <?php } else { ?>
@@ -33,13 +33,27 @@ if (file_exists($directory.'/local/fajar-moodle-sync/course_list.php')){
     <option value ="<?php echo $dir;?>"><?php echo $dir;?></option>
   <?php } ?>
 </select> 
-<input type="submit" value="choose"> &nbsp; <a href="settings.php">Settings</a>&nbsp;<a href="../main_console.php"> Main Console</a>
+<a href="settings.php">Settings</a>&nbsp;<a href="../main_console.php"> Main Console</a>
 </form>
 
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
   <input type="submit" name="cli-backup-all" value="cli-backup-all"> click this button for Moodle cli to do automatically 
   <a href="http://<?php echo $moodle_url.'/admin/settings.php?section=backupgeneralsettings';?>">Backup Default Settings</a> <br>
-  <input type="submit" name="update-all" value="update-all">
+</form>
+<form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
+  <select name="method">
+    <option value="rdiff">rdiff</option>
+    <option value="rdiffdir">rdiffdir</option>
+  </select>
+  <select name="update-all" onclick="this.form.submit()">
+    <option value="update">update all (automatic)</option>
+    <option value="make_signature">make signature all (manual)</option>
+    <option value="send_signature">send signature all (manual)</option>
+    <option value="get_delta">get delta all (manual)</option>
+    <option value="apply_patch">apply patch all (manual)</option>
+    <option value="test">test</option>
+  </select>
+  Split<input type="text" name="split">
 </form>
 <br><br>
 
@@ -60,6 +74,9 @@ if(isset($_POST['cli-backup-all'])){
       }
     }
     echo $destination = '"'.realpath('./courses/'.$dir).'"';
+    while(current($my_course) != $dir){
+      next($my_course);
+    } 
     $course_id = key($my_course);
     echo system("/usr/bin/php $directory/admin/cli/backup.php --courseid=$course_id --destination=$destination");
     foreach (glob('./courses/'.$dir . '/backup*') as $filename) {   
@@ -78,7 +95,35 @@ if(isset($_POST['update-all'])){
       echo 'Main server location was not defined for '.$dir.' course. Choose the course on the menu and go to its setting. <br>';
       continue;
     }      
-    echo './courses/'.$dir.'<br>';
+    require('./courses/'.$dir .'/varset.php');
+    $_SESSION['method'] = $_POST['method'];
+    $manual_backup = new backup('./courses/'.$dir, $_POST['method'], $_POST['split'], $url, $content_url);
+    switch ($_POST['update-all']) {
+      case 'update':
+        $manual_backup->make_signature();
+        $manual_backup->send_signature();
+        $manual_backup->download_patch();
+        $manual_backup->apply_patch();
+        break;
+      case 'make_signature':
+        $manual_backup->make_signature();
+	echo $_POST['option'];
+        break;
+      case 'send_signature':
+        $manual_backup->send_signature();
+        break;
+      case 'get_delta':
+        $manual_backup->download_patch();
+        break;
+      case 'apply_patch':
+        $manual_backup->apply_patch();
+        break;
+      case 'test':
+	echo '<script> alert("'.$_POST['split'].'") </script>';
+      default:
+        //echo '<script> alert("'.$_POST['update'].'"); </script>';
+        break;
+    }
   }
 }
 ?>
@@ -206,13 +251,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['option'] != NULL){
     <input type="submit" name="undo" value="undo">
     <!--<input type="submit" name="test" value="test">-->
     </form>
-    <button onclick="myFunction()">Refresh</button>
+    <button onclick="location.reload()">Refresh</button>
 
-    <script>
-    function myFunction() {
-        location.reload();
-    }
-    </script>
   <a href="settings.php"> Settings</a>
   </form>
   <a href="http://<?php echo $moodle_url.'/backup/restorefile.php?contextid=1'; ?>"> Restore Course Manually</a>

@@ -8,8 +8,9 @@
               $this->backup_dir = $backup_dir;
               $this->method = $method;
               $this->split = $split;
-	      $this->url = $url;
-	      $this->content_url = $content_url;
+	      $this->url = str_replace(' ', '%20', $url);
+	      $this->content_url = str_replace(' ', '%20', $content_url);
+              
             }   
   
    // Creating a method (function tied to an object)
@@ -44,7 +45,8 @@
 	    public function send_signature() {
 	      foreach (glob($this->backup_dir.'/*sig') as $filename) {
                 if (file_exists($filename)) {
-	          $target_url = $this->url.'rdiff_make_patch.php';
+	          echo $target_url = $this->url.'rdiff_make_patch.php';
+                  echo '<br>';
 	          $file_name_with_full_path = realpath($filename);
  	          $post = array('split' => $this->split,'file_contents'=>new \CURLFile($file_name_with_full_path), 'method' => $this->method);
 	          $ch = curl_init();
