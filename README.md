@@ -1,3 +1,11 @@
+https://www.youtube.com/user/PurnamaABC
+
+https://www.slideshare.net/0DarkKing0/rdiff-and-rsync-implementation-on-moodles-backup-and-restore-feature-of-course-synchronization-over-the-network-presentation
+
+https://www.slideshare.net/0DarkKing0/compatible-course-content-synchronization-model-for-course-distribution-over-the-network-for-tokuen-2016
+
+https://www.slideshare.net/0DarkKing0/portable-and-synchronized-distributed-learning-management-system-in-severe-networked-regions
+
 # file-synchronizer-online-course-sharing
 Designed for online course synchronization (updater) written based on rsync algorithm in php.
 
