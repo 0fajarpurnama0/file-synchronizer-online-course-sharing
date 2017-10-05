@@ -22,7 +22,7 @@ Designed for online course synchronization (updater) written based on rsync algo
 
 # Dependencies for using these scripts.
 
-apache2, php, php-curl, librsync, rdiff, rdiff, duplicity
+apache2, php, php-curl, librsync, rdiff, rdiff, duplicity, MOOSH (will be implemented in the future)
 
 # Disclaimer
 
