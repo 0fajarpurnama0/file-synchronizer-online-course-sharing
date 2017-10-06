@@ -1,6 +1,6 @@
 <?php
 //define('CLI_SCRIPT', true);
-require_once('/var/www/html/fajar_moodle' . '/config.php');
+require_once('../../config.php');
 $courses = get_courses();
 
 //print_r($courses[4]->shortname);
