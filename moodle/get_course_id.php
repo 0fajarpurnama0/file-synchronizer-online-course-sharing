@@ -13,7 +13,7 @@ print_r($my_course);
 
 //echo $courses[1];
 
- $myfile = fopen("test.php", "w") or die("Unable to open file!");
+ $myfile = fopen("course_list.php", "w") or die("Unable to open file!");
  $txt = '<?php ';
  fwrite($myfile, $txt);
  foreach ($courses as $value) {
