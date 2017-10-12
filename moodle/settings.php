@@ -62,13 +62,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   }
   if (file_exists($directory.'/local/fajar-moodle-sync/get_course_id.php')){ 
 ?>
-    <form method="post" action="http://<?php echo $moodle_url.'/local/fajar-moodle-sync/get_course_id.php';?>">
+    <form target="_blank" method="post" action="http://<?php echo $moodle_url.'/local/fajar-moodle-sync/get_course_id.php';?>">
     <input type="submit" value="generate course list">
 <?php
   } else {
     if (!copy('get_course_id.php', $directory . '/local/fajar-moodle-sync/get_course_id.php')) {
-        echo $directory;
-        echo 'failed to copy get_course_id.php...\n';
+      echo '<br> failed to copy get_course_id.php... <br>';
+      if (!file_exists($directory.'/local/fajar-moodle-sync')){
+	echo $directory.'/local/fajar-moodle-sync does not exist';
+      } else {
+	echo 'Check the following for '.$directory.'/local/fajar-moodle-sync : <br>';
+	echo 'Owner: '; print_r(posix_getpwuid(fileowner($directory.'/local/fajar-moodle-sync')));
+	echo '<br> Permission: '.substr(sprintf('%o', fileperms($directory.'/local/fajar-moodle-sync')), -4);
+      }
     }
   }
 }

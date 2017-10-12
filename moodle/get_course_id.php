@@ -5,7 +5,7 @@ $courses = get_courses();
 
 //print_r($courses[4]->shortname);
 foreach ($courses as $value) {
-  $my_course["$value->id"] = $value->shortname;
+  $my_course["$value->id"] = $value->fullname;
   //echo "$value->shortname <br>";
 }
 
@@ -17,7 +17,7 @@ print_r($my_course);
  $txt = '<?php ';
  fwrite($myfile, $txt);
  foreach ($courses as $value) {
-   $txt = '$my_course['."$value->id".']='."'"."$value->shortname"."'".';';
+   $txt = '$my_course['."$value->id".']='."'"."$value->fullname"."'".';';
    fwrite($myfile, $txt);
  }
  $txt = '?>';

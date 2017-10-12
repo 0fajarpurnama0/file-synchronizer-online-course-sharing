@@ -14,6 +14,8 @@
   
    // Creating a method (function tied to an object)
 	    public function make_signature() {
+              echo '<p id="loading"></p>';
+	      echo '<script> document.getElementById("loading").innerHTML = "<div class=\"loader\"></div> Please wait!" </script>';
               foreach (glob($this->backup_dir.'/*.sig') as $filename) {    
                 if (file_exists($filename)) {
 	          unlink($filename);
@@ -39,11 +41,28 @@
                   }
 	        }
               }
+              foreach (glob($this->backup_dir.'/*.sig') as $filename) {    
+                if (file_exists($filename)) {
+                  echo '<script> document.getElementById("loading").innerHTML = "'.$filename.' Created!" </script>';
+	        }
+              }
 	    }
 
 	    public function send_signature() {
 	      foreach (glob($this->backup_dir.'/*sig') as $filename) {
                 if (file_exists($filename)) {
+	           ob_start();
+                   echo '<script type="text/javascript">
+                        function updateProgress(percentage) {
+                        document.getElementById(\'progress\').value = percentage;
+                        }
+                        </script> <br> <br>
+                        Uploading Signature: <progress id="uprog" value="0" max="100.0"></progress><span id="uprogval"></span>
+                        ';
+
+                  ob_flush();
+                  flush();
+		  $temp_progress = '';
 	          $target_url = $this->url.'rdiff_make_patch.php';
 	          $file_name_with_full_path = realpath($filename);
  	          $post = array('split' => $this->split,'file_contents'=>new \CURLFile($file_name_with_full_path), 'method' => $this->method);
@@ -52,9 +71,13 @@
  	          curl_setopt($ch, CURLOPT_POST,1);
  	          curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
  	          curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
+                  curl_setopt( $ch, CURLOPT_NOPROGRESS, false );
+                  curl_setopt( $ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback' );
  	          $result=curl_exec ($ch);
  	          curl_close ($ch);
  	          echo $result;
+                  ob_flush();
+                  flush();
                 } 
 	      }
 	    }
@@ -149,6 +172,19 @@
 	      if ($this->split>1) {
 		for ($i = 0; $i < $this->split; $i++){
 		  //This is the file where we save the    information
+                  ob_start();
+                  echo '<script type="text/javascript">
+                    function updateProgress(percentage) {
+                    document.getElementById(\'progress\').value = percentage;
+                    }
+                    document.getElementById("my_progress").innerHTML = "Downloading md5sum'.$i.': <progress id=\"prog\" value=\"0\" max=\"100.0\"></progress><span id=\"progval\"></span>"
+                    </script> <br> <br>
+                    <p id="my_progress"></p>
+                    ';
+
+                  ob_flush();
+                  flush();
+                  $temp_progress = '';
 	          $fp = fopen ($this->backup_dir.'/md5sum'.$i,'w+');
                   $url = $this->url.'md5sum'.$i;
 	          $headers=get_headers('http://'.$url);
@@ -163,15 +199,19 @@
                   }
 	          //Here is the file we are downloading, replace spaces with %20
 	          $ch = curl_init(str_replace(" ","%20",$url));
-	          curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+	          #curl_setopt($ch, CURLOPT_TIMEOUT, 50);
 	          // write curl response to file
+                  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                  curl_setopt( $ch, CURLOPT_NOPROGRESS, false );
+                  curl_setopt( $ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback' );
 	          curl_setopt($ch, CURLOPT_FILE, $fp); 
-	          curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	          #curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 	          // get curl response
 	          curl_exec($ch); 
 	          curl_close($ch);
 	          fclose($fp);
-
+                  ob_flush();
+                  flush();
                   foreach (glob($this->backup_dir.'/backup.*') as $filename) {
 	            foreach (glob($this->backup_dir.'/*.sig') as $signature) {
 		      if (file_exists($signature)) {
@@ -180,6 +220,17 @@
                             if (file_exists($filename.'.delta'.$i)) {
 			      unlink($filename.'.delta');
 			    }	
+			    echo '<script type="text/javascript">
+                            function updateProgress(percentage) {
+                            document.getElementById(\'progress\').value = percentage;
+                            }
+                            document.getElementById("my_progress").innerHTML = "Downloading backup.delta'.$i.': <progress id=\"prog\" value=\"0\" max=\"100.0\"></progress><span id=\"progval\"></span>"
+                            </script> <br> <br>
+                            <p id="my_progress"></p>
+                            ';
+                            ob_flush();
+                            flush();
+                            $temp_progress = '';
 	                    $fp = fopen($filename.'.delta'.$i,'w+');
 		              if ((strcmp(pathinfo($filename, PATHINFO_EXTENSION),'gz')==0) || (strcmp(pathinfo($filename, PATHINFO_EXTENSION),'bz2')==0)) { 
 		              $url = $this->url.'/backup.tar.'.pathinfo($filename, PATHINFO_EXTENSION).'.delta'.$i;
@@ -187,19 +238,38 @@
 		              $url = $this->url.'/backup.'.pathinfo($filename, PATHINFO_EXTENSION).'.delta'.$i;
 		            }
 	                    $ch = curl_init(str_replace(" ","%20",$url));
-	                    curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+	                    #curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+               		    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                	    curl_setopt( $ch, CURLOPT_NOPROGRESS, false );
+               		    curl_setopt( $ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback' );
 	                    curl_setopt($ch, CURLOPT_FILE, $fp); 
-	                    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	                    #curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 	                    curl_exec($ch); 
 	                    curl_close($ch);
 		            fclose($fp);
+			    ob_flush();
+                	    flush();
 		          }
        		        }
 	              }
 	            }
 		  }
 		}
+              echo 'done';
               } else {
+	        ob_start();
+                echo '<script type="text/javascript">
+                    function updateProgress(percentage) {
+                    document.getElementById(\'progress\').value = percentage;
+                    }
+                    document.getElementById("my_progress").innerHTML = "Downloading md5sum: <progress id=\"prog\" value=\"0\" max=\"100.0\"></progress><span id=\"progval\"></span>"
+                    </script> <br> <br>
+                    <p id="my_progress"></p>
+                    ';
+
+                ob_flush();
+                flush();
+                $temp_progress = '';
 	        $fp = fopen ($this->backup_dir.'/md5sum','w+');
                 $url = $this->url.'md5sum';
 	        $headers=get_headers('http://'.$url);
@@ -211,13 +281,17 @@
     		  }
                 }
 	        $ch = curl_init(str_replace(" ","%20",$url));
-	        curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+	        #curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt( $ch, CURLOPT_NOPROGRESS, false );
+                curl_setopt( $ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback' );
 	        curl_setopt($ch, CURLOPT_FILE, $fp); 
-	        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	        #curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 	        curl_exec($ch); 
 	        curl_close($ch);
 	        fclose($fp);
-		
+                ob_flush();
+                flush();
                 foreach (glob($this->backup_dir.'/backup.*') as $filename) {
 	          foreach (glob($this->backup_dir.'/*.sig') as $signature) {
 		    if (file_exists($signature)) {
@@ -226,6 +300,18 @@
                           if (file_exists($filename.'.delta')) {
 			    unlink($filename.'.delta');
 			  }
+	                  ob_start();
+                          echo '<script type="text/javascript">
+                          function updateProgress(percentage) {
+                          document.getElementById(\'progress\').value = percentage;
+                          }
+                    document.getElementById("my_progress").innerHTML = "Downloading backup.delta: <progress id=\"prog\" value=\"0\" max=\"100.0\"></progress><span id=\"progval\"></span>"
+                          </script> <br> <br>
+                          <p id="my_progress"></p>
+                          ';
+                          ob_flush();
+                          flush();
+                          $temp_progress = '';
 	                  $fp = fopen($filename.'.delta','w+');
 		          if ((strcmp(pathinfo($filename,PATHINFO_EXTENSION),'gz')==0) || (strcmp(pathinfo($filename,PATHINFO_EXTENSION),'bz2')==0)) { 
 		            $url = $this->url.'/backup.tar.'.pathinfo($filename, PATHINFO_EXTENSION).'.delta';
@@ -233,12 +319,18 @@
 		            $url = $this->url.'/backup.'.pathinfo($filename, PATHINFO_EXTENSION).'.delta';
 		          }
 	                  $ch = curl_init(str_replace(" ","%20",$url));
-	                  curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+	                  #curl_setopt($ch, CURLOPT_TIMEOUT, 50);
+                	  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                	  curl_setopt( $ch, CURLOPT_NOPROGRESS, false );
+                	  curl_setopt( $ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback' );
 	                  curl_setopt($ch, CURLOPT_FILE, $fp); 
-	                  curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	                  #curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 	                  curl_exec($ch); 
 	                  curl_close($ch);
 		          fclose($fp);
+			  echo "Done";
+                	  ob_flush();
+                	  flush();
 		        }
        		      }
 	            }
@@ -248,19 +340,39 @@
 	    }
 	    
 	    public function get_content() {
+              ob_start();
+              echo '<script type="text/javascript">
+                    function updateProgress(percentage) {
+                    document.getElementById(\'progress\').value = percentage;
+                    }
+                    </script> <br> <br>
+                    Downloading Course Archive: <progress id="prog" value="0" max="100.0"></progress><span id="progval"></span>
+                    ';
+
+              ob_flush();
+              flush();
+              $temp_progress = '';
 	      $extension = pathinfo($this->content_url, PATHINFO_EXTENSION);
 	      $fp = fopen ($this->backup_dir.'/backup.'.$extension,'w+');
               $url = $this->content_url;
 	      $ch = curl_init(str_replace(" ","%20",$url));
-	      curl_setopt($ch, CURLOPT_TIMEOUT, 50);
-	      curl_setopt($ch, CURLOPT_FILE, $fp); 
-	      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+	      #curl_setopt($ch, CURLOPT_TIMEOUT, 50); 
+	      #curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+              curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+              curl_setopt( $ch, CURLOPT_NOPROGRESS, false );
+              curl_setopt( $ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback' );
+              curl_setopt($ch, CURLOPT_FILE, $fp);
 	      curl_exec($ch); 
 	      curl_close($ch);
 	      fclose($fp);
+              echo "Done";
+              ob_flush();
+              flush();
 	    }
 
 	    public function apply_patch() {
+              echo '<p id="loading"></p>';
+	      echo '<script> document.getElementById("loading").innerHTML = "<div class=\"loader\"></div> Please wait!" </script>';
 	      if ($this->split>1) {
 		foreach (glob($this->backup_dir.'/backup.*') as $filename) {
 		  if ((strcmp(pathinfo($filename, PATHINFO_EXTENSION),'mbz')==0) || (strcmp(pathinfo($filename, PATHINFO_EXTENSION),'gz')==0) || (strcmp(pathinfo($filename, PATHINFO_EXTENSION),'zip')==0) || (strcmp(pathinfo($filename, PATHINFO_EXTENSION),'bz2')==0)) {
@@ -310,7 +422,7 @@
                       } else {
                         rename($filename,$filename.'.backup');
 	                exec("rdiff patch '$filename.backup' '$filename.delta' '$filename'");
-                        echo "update complete";
+                        echo '<script> document.getElementById("loading").innerHTML = "Patch Complete" </script>';
                       }
                     }
 		  }
@@ -334,5 +446,39 @@
 	    }
 	  }
 	}
+  }
+
+  function progressCallback( $resource, $download_size, $downloaded_size, $upload_size, $uploaded_size ){
+    static $previousProgress = 0;
+    if ( $download_size == 0 ) {
+        $progress = 0;
+    } else {
+        $progress = round( $downloaded_size * 100 / $download_size );
+	}
+    if ( $progress > $previousProgress)
+    {
+        $previousProgress = $progress;
+        $temp_progress = $progress;
+    }
+    echo '<script>document.getElementById(\'prog\').value = '.$progress.';</script>';	
+    echo '<script>document.getElementById("progval").innerHTML = "'.$downloaded_size.'/'.$download_size.'"</script>';
+    ob_flush();
+    flush();
+
+    static $previousUProgress = 0;
+    if ( $upload_size == 0 ) {
+        $Uprogress = 0;
+    } else {
+        $Uprogress = round( $uploaded_size * 100 / $upload_size );
+	}
+    if ( $Uprogress > $previousUProgress)
+    {
+        $previousUProgress = $Uprogress;
+        $temp_Uprogress = $Uprogress;
+    }
+    echo '<script>document.getElementById(\'uprog\').value = '.$Uprogress.';</script>';	
+    echo '<script>document.getElementById("uprogval").innerHTML = "'.$uploaded_size.'/'.$upload_size.'"</script>';
+    ob_flush();
+    flush();
   }
 ?>

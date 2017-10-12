@@ -12,15 +12,18 @@ if (file_exists($directory.'/local/fajar-moodle-sync/course_list.php')){
 
 <html>
 <head>
+<script>
+function Refresh() {
+    location.reload();
+}
+</script>
 <title>Moodle Backup Rdiff Synchronization</title>
 <link rel="stylesheet" type="text/css" href="main.css"/>
 </head>
 <body>
-
 <h1>Moodle Backup Rdiff Synchronizer</h1>
 <h3>Based on rdiff: a controlled rsync application.</h3>
 <h3>If course doesn't exist, create a blank course manually at your moodle site.</h3>
-
 <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
 <select name="option">
   <?php foreach($my_course as $dir) {?>
@@ -44,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
   <a href="http://<?php echo $moodle_url.'/backup/backup.php?id='."$course_id"; ?>">Backup the course manually and upload the backup file here!</a> <br>
   <form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
   <input type="hidden" name="option" value="<?php echo $_POST['option'];?>">
-  <input type="submit" name="cli-backup" value="cli-backup"> or click this button for Moodle cli to do automatically 
+  <input type="submit" name="cli-backup" value="cli-backup" onclick='document.getElementById("loading").innerHTML = "Please wait! <div class=\"loader\"></div>"'> or click this button for Moodle cli to do automatically 
   </form><a href="http://<?php echo $moodle_url.'/admin/settings.php?section=backupgeneralsettings';?>">Backup Default Settings</a>
   <br><br>
   <form enctype="multipart/form-data" action="upload.php" method="POST">
@@ -146,13 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
     <input type="submit" name="undo" value="undo">
     <!--<input type="submit" name="test" value="test">-->
     </form>
-    <button onclick="myFunction()">Refresh</button>
+    <button onclick="Refresh()">Refresh</button>
 
-    <script>
-    function myFunction() {
-        location.reload();
-    }
-    </script>
   <a href="settings.php"> Settings</a>
   </form>
   <a href="http://<?php echo $moodle_url.'/backup/restorefile.php?contextid=1'; ?>"> Restore Course Manually</a>
@@ -174,6 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
         rename($filename, $_POST['option'].'/backup.tar.'.pathinfo($filename, PATHINFO_EXTENSION));
       }
     }
+    echo '<script> document.getElementById("loading").innerHTML = "Done!" </script>';
   }
     if (isset($_POST['update'])) {
       require($_POST['option'] .'/varset.php');
@@ -251,5 +250,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST'){
 	}
       }
     }
-}      
+}    
+
+function executeAsyncShellCommand($comando = null){
+   if(!$comando){
+       throw new Exception("No command given");
+   }
+   // If windows, else
+   if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+       system($comando." > NUL");
+   }else{
+       shell_exec("/usr/bin/nohup ".$comando." >/dev/null 2>&1 &");
+   }
+}  
 ?>
+<p id="loading"></p>
+</body>
+</html>
