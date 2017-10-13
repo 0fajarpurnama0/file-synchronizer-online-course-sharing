@@ -30,7 +30,7 @@ These scripts are still beta versions, which in the future will be mold into a p
 
 # Usage (Beta)
 
-1. Place these scripts into a web server and access the folder via browser. The scripts are tested with ownership of the directory is the webserver (chown -R www-data directory), or simply allow full access if you don't care (chmod -R 777 directory).
+1. Place these scripts into a web server and access the folder via browser. The scripts are tested with ownership of the directory is the webserver for user and group (chown -R www-data:www-data directory), or simply allow full access if you don't care (chmod -R 777 directory, keep doing this everytime you encounter error).
 
 Manual: http based rsync between two file.
 Moodle: environment set on moodle. (able to identify course, perform automatic backup, in the future perform automatic restore, function to rsync all course at once comming soon).
@@ -48,7 +48,7 @@ If manual is chosen:
 
 If Moodle is chosen.
 
-2. It is needed to create a directory fajar-moodle-sync owned by www-data under moodle_directory/local, a notice is also given on this section (i.e. sudo mkdir /var/www/html/moodle/local/fajar-moodle-sync; sudo chown www-data:www-data /var/www/html/moodle/local/fajar-moodle-sync). This step is unnecessary once it is a moodle plugin, or please inform if you have a better way.
+2. It is needed to create a directory fajar-moodle-sync owned by www-data for user and group under moodle_directory/local, a notice is also given on this section (i.e. sudo mkdir /var/www/html/moodle/local/fajar-moodle-sync; sudo chown www-data:www-data /var/www/html/moodle/local/fajar-moodle-sync). This step is unnecessary once it is a moodle plugin, or please inform if you have a better way.
 3. Go to setting and set the Moodle directory location (i.e. /var/www/html/moodle) and Moodle url (i.e. md.hicc.cs.kumamotou.ac.jp, another i.e. 127.0.0.1/fajar_moodle).
 4. If succeeded the click generate course list button. If this doesn't work, try the return button and go back to setting menu, check if i.e. /var/www/html/moodle/local/fajar-moodle-sync/get_course_id.php script exist, then access this location via browser manually. The main menu will have the list of the course available on the Moodle site (to add more list, manually create new course on Moodle and re-run step 3 again).
 5. After choosing a menu there will be a button to automatically generate a course backup using
