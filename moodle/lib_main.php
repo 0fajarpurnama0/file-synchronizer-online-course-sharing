@@ -187,10 +187,10 @@
                   $temp_progress = '';
 	          $fp = fopen ($this->backup_dir.'/md5sum'.$i,'w+');
                   $url = $this->url.'md5sum'.$i;
-	          $headers=get_headers('http://'.$url);
+	          $headers=get_headers('http://'.str_replace(" ","%20",$url));
                   $start_time = time();
                   while (!stripos($headers[0],"200 OK")){
-		    $headers=get_headers('http://'.$url);
+		    $headers=get_headers('http://'.str_replace(" ","%20",$url));
                     if (((time() - $start_time) > 3) && ($i == $this->split-1)) {
       		      break; // timeout, function took longer than 20 seconds
     		    } elseif ((time() - $start_time) > 3) {
@@ -272,10 +272,10 @@
                 $temp_progress = '';
 	        $fp = fopen ($this->backup_dir.'/md5sum','w+');
                 $url = $this->url.'md5sum';
-	        $headers=get_headers('http://'.$url);
+	        $headers=get_headers('http://'.str_replace(" ","%20",$url));
                 $start_time = time();
                 while (!stripos($headers[0],"200 OK")){
-		  $headers=get_headers('http://'.$url);
+		  $headers=get_headers('http://'.str_replace(" ","%20",$url));
                   if ((time() - $start_time) > 3) {
       		    die('timeout');
     		  }
