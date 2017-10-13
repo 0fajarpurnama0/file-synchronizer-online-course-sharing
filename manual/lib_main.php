@@ -67,7 +67,7 @@
 	          $file_name_with_full_path = realpath($filename);
  	          $post = array('split' => $this->split,'file_contents'=>new \CURLFile($file_name_with_full_path), 'method' => $this->method);
 	          $ch = curl_init();
- 	          curl_setopt($ch, CURLOPT_URL,$target_url);
+ 	          curl_setopt($ch, CURLOPT_URL,str_replace(" ","%20",$target_url));
  	          curl_setopt($ch, CURLOPT_POST,1);
  	          curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
  	          curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
