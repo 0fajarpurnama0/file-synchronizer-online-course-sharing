@@ -30,7 +30,7 @@ function Refresh() {
     <option value ="<?php echo $dir;?>"><?php echo $dir;?></option>
   <?php } ?>
 </select> 
-<input type="submit" value="choose"> &nbsp; <a href="settings.php">Settings</a>&nbsp;<a href="../main_console.php"> Main Console</a>
+<input type="submit" value="choose"> &nbsp; <a href="settings.php">Settings</a>&nbsp;<a href="../index.php"> Main Console</a>
 </form>
 
 <?php 
