@@ -21,7 +21,7 @@ require('lib_main.php');
   <?php } ?>
 </select>
 <input type="submit" value="choose">
-</form><a href="../main_console.php"> Main Console</a>
+</form><a href="../index.php"> Main Console</a>
 
 <?php 
 if ($_SERVER['REQUEST_METHOD'] == 'POST'){
